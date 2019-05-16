@@ -1,0 +1,5 @@
+requests
+lxml
+py-moneyed
+tqdm
+selenium
