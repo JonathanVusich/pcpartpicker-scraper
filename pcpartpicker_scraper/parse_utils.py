@@ -53,25 +53,6 @@ def boolean(bool_str: str) -> Optional[bool]:
     logger.debug(f"{bool_str} is not a valid boolean!")
 
 
-def retrieve_brand_info(model_string: str) -> Tuple[Optional[str], Optional[str]]:
-    for x in range(len(model_string) + 1):
-        if model_string[:x] in brands:
-            try:
-                next_char = model_string[x]
-                if not next_char == " ":
-                    continue
-                raise IndexError
-            except IndexError:
-                brand = model_string[:x].strip().lstrip()
-                model = model_string[x:].strip().lstrip()
-                if not model:
-                    return brand, None
-                else:
-                    return brand, model
-    logger.warning(f"Could not find brand in {model_string}!")
-    return None, model_string
-
-
 def core_clock(clock_data: str) -> Optional[ClockSpeed]:
     """
     Hidden function that extracts core clock data from a raw string.
@@ -347,7 +328,7 @@ part_funcs: Dict[str, List[Callable]] = {
     "wired-network-card": [default, network_speed, default],
     "wireless-network-card": [default, default, default],
     "monitor": [num, resolution, retrieve_int, retrieve_int, default, default],
-    "external-hard-drive": [default, default, to_bytes, price, default, hdd_data],
+    "external-hard-drive": [default, default, to_bytes, price, default],
     "headphones": [default, frequency_response, boolean, boolean, default, default],
     "keyboard": [default, default, default, boolean, default, default],
     "mouse": [default, default, int, default, default],

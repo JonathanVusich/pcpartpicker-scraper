@@ -1,4 +1,5 @@
 from .scraper import Scraper
+from .parser import Parser
 from .parts import *
 
 __name__ = ["pcpartpicker_scraper"]
