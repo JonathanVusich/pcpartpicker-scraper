@@ -3,3 +3,4 @@ lxml
 py-moneyed
 tqdm
 selenium
+lz4

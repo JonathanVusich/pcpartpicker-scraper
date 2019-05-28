@@ -1,6 +1,8 @@
 import time
 import json
 import pickle
+from pathlib import Path
+import lz4.frame
 import bz2
 import sys
 
@@ -93,6 +95,25 @@ def deserialize_json():
     unserialized_cache = Cache("/deserialized_json/")
     unserialized_cache["current"] = all_data
 
+def update_html():
+    cache = Cache("/deserialized_json/")
+    all_data = cache["current"]
+    path = Path("/home/chrx/repos/pcpartpicker-scraper/docs")
+    if not path.exists():
+        path.mkdir()
+    for region in all_data:
+        region_path = path / region
+        if not region_path.exists():
+            region_path.mkdir()
+        for part in all_data[region]:
+            part_data = all_data[region][part]
+            dict_data = [dataclass_to_dict(item) for item in part_data]
+            part_string = json.dumps(dict_data).encode()
+            compressed_parts = lz4.frame.compress(part_string)
+            file_name = part + ".html"
+            with open(region_path / file_name, "wb") as file:
+                file.write(compressed_parts)
+
 
 def update_cache_format():
     cache = Cache("/tmp/")
@@ -120,4 +141,4 @@ def get_size():
 
 
 if __name__ == "__main__":
-    deserialize_json()
+    update_html()
