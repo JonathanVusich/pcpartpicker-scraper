@@ -1,6 +1,8 @@
 import time
 import json
 import pickle
+import base64
+import subprocess
 from pathlib import Path
 import lz4.frame
 import bz2
@@ -14,6 +16,18 @@ from pcpartpicker_scraper import Scraper
 from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 from pcpartpicker_scraper.parse_utils import tokenize
 from pcpartpicker_scraper.mappings import part_classes
+
+
+html_doc = """<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Data</title>
+  </head>
+  <body>
+  {}
+  </body>
+</html>"""
 
 
 def scrape_part_data():
@@ -110,9 +124,11 @@ def update_html():
             dict_data = [dataclass_to_dict(item) for item in part_data]
             part_string = json.dumps(dict_data).encode()
             compressed_parts = lz4.frame.compress(part_string)
+            encoded_parts = base64.urlsafe_b64encode(compressed_parts)
+            html = html_doc.format(encoded_parts)
             file_name = part + ".html"
-            with open(region_path / file_name, "wb") as file:
-                file.write(compressed_parts)
+            with open(region_path / file_name, "w+") as file:
+                file.write(html)
 
 
 def update_cache_format():
@@ -140,5 +156,11 @@ def get_size():
     return sys.getsizeof(data)
 
 
+def publish():
+    subprocess.run(["git", "add", "."], cwd="/home/chrx/repos/pcpartpicker-scraper")
+    subprocess.run(["git", "commit", "-m", "'Updated HTML'"], cwd="/home/chrx/repos/pcpartpicker-scraper")
+    subprocess.run(["git", "push"], cwd="/home/chrx/repos/pcpartpicker-scraper")
+
+
 if __name__ == "__main__":
-    update_html()
+    publish()
