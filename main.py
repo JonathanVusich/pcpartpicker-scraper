@@ -124,7 +124,7 @@ def update_html():
             dict_data = [dataclass_to_dict(item) for item in part_data]
             part_string = json.dumps(dict_data).encode()
             compressed_parts = lz4.frame.compress(part_string)
-            encoded_parts = base64.urlsafe_b64encode(compressed_parts)
+            encoded_parts = str(base64.urlsafe_b64encode(compressed_parts), 'utf-8')
             html = html_doc.format(encoded_parts)
             file_name = part + ".html"
             with open(region_path / file_name, "w+") as file:
@@ -159,8 +159,8 @@ def get_size():
 def publish():
     subprocess.run(["git", "add", "."], cwd="/home/chrx/repos/pcpartpicker-scraper")
     subprocess.run(["git", "commit", "-m", "'Updated HTML'"], cwd="/home/chrx/repos/pcpartpicker-scraper")
-    subprocess.run(["git", "push"], cwd="/home/chrx/repos/pcpartpicker-scraper")
 
 
 if __name__ == "__main__":
+    update_html()
     publish()
