@@ -1,6 +1,4 @@
-import json
 import base64
-import bz2
 import json
 import subprocess
 from pathlib import Path
@@ -11,8 +9,7 @@ from tqdm import tqdm
 
 from pcpartpicker_scraper import Parser
 from pcpartpicker_scraper import Scraper
-from pcpartpicker_scraper.mappings import part_classes
-from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
+from pcpartpicker_scraper.serialization import dataclass_to_dict
 
 html_doc = """<!DOCTYPE html>
 <html lang="en">
