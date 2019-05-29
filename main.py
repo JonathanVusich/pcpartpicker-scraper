@@ -1,22 +1,18 @@
-import time
 import json
-import pickle
 import base64
+import bz2
+import json
 import subprocess
 from pathlib import Path
-import lz4.frame
-import bz2
-import sys
 
+import lz4.frame
 from diskcache import Cache
 from tqdm import tqdm
 
 from pcpartpicker_scraper import Parser
 from pcpartpicker_scraper import Scraper
-from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
-from pcpartpicker_scraper.parse_utils import tokenize
 from pcpartpicker_scraper.mappings import part_classes
-
+from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 
 html_doc = """<!DOCTYPE html>
 <html lang="en">
@@ -88,29 +84,12 @@ def create_json():
             data_to_dict = [dataclass_to_dict(item) for item in data]
             dict_data.update({part: data_to_dict})
         all_data.update({region: dict_data})
-    json_string = json.dumps(all_data).encode()
-    compressed_string = bz2.compress(json_string, compresslevel=9)
-    compressed_cache = Cache("/json/")
-    compressed_cache["current"] = compressed_string
-
-
-def deserialize_json():
     cache = Cache("/json/")
-    compressed_json = cache["current"]
-    json_string = bz2.decompress(compressed_json)
-    data = json.loads(json_string.decode(encoding="utf8"))
-    all_data = {}
-    for region, region_data in tqdm(data.items()):
-        deserialized_region_data = {}
-        for part, data in region_data.items():
-            deserialized_data = [dataclass_from_dict(part_classes[part], item) for item in data]
-            deserialized_region_data.update({part: deserialized_data})
-        all_data.update({region: deserialized_region_data})
-    unserialized_cache = Cache("/deserialized_json/")
-    unserialized_cache["current"] = all_data
+    cache["current"] = all_data
+
 
 def update_html():
-    cache = Cache("/deserialized_json/")
+    cache = Cache("/json/")
     all_data = cache["current"]
     path = Path("/home/chrx/repos/pcpartpicker-scraper/docs")
     if not path.exists():
@@ -131,36 +110,14 @@ def update_html():
                 file.write(html)
 
 
-def update_cache_format():
-    cache = Cache("/tmp/")
-    for region in cache:
-        part_data = cache[region]
-        for part in part_data:
-            manufacturers, data = part_data[part]
-            parts = [token for p in data for token in p]
-            part_data[part] = manufacturers, parts
-        cache[region] = part_data
-
-    for region in cache:
-        part_data = cache[region]
-        for part in part_data:
-            manufacturers, data = part_data[part]
-            parts = list(tokenize(part, data))
-            part_data[part] = manufacturers, parts
-        cache[region] = part_data
-
-
-def get_size():
-    cache = Cache("/json/")
-    data = cache["current"]
-    return sys.getsizeof(data)
-
-
 def publish():
     subprocess.run(["git", "add", "."], cwd="/home/chrx/repos/pcpartpicker-scraper")
     subprocess.run(["git", "commit", "-m", "'Updated HTML'"], cwd="/home/chrx/repos/pcpartpicker-scraper")
 
 
 if __name__ == "__main__":
+    scrape_part_data()
+    parse_part_data()
+    create_json()
     update_html()
     publish()
