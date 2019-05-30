@@ -124,14 +124,13 @@ def find_products(html: str) -> list:
 
 
 def parse_elements(elements: list) -> Tuple[Optional[str]]:
-    text_elements = []
+    text_elements: List[Optional[str]] = []
     for element in elements:
-        text = element.xpath("text()")
-        if len(text) == 0:
+        text: str = element.xpath("text()")
+        if not text:
             text_elements.append(None)
         elif len(text) == 1:
-            text_elements.extend(str(text))
+            text_elements.append(text[0])
         else:
-            element_string = str(" ".join(text))
-            text_elements.append(element_string)
+            text_elements.append(" ".join(text))
     return tuple(text_elements)

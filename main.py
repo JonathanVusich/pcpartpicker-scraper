@@ -9,7 +9,8 @@ from tqdm import tqdm
 
 from pcpartpicker_scraper import Parser
 from pcpartpicker_scraper import Scraper
-from pcpartpicker_scraper.serialization import dataclass_to_dict
+from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
+from pcpartpicker_scraper.mappings import part_classes
 
 html_doc = """<!DOCTYPE html>
 <html lang="en">
@@ -36,14 +37,7 @@ def scrape_part_data():
     scraper = Scraper("/usr/lib/chromium-browser/chromedriver")
     cache = Cache("/tmp/")
     cache.clear()
-    regions_to_scrape = set()
-    for region in supported_regions:
-        if region in cache:
-            region_data = cache[region]
-            for part in supported_parts:
-                if part not in region_data:
-                    regions_to_scrape.add(region)
-    for region in tqdm(regions_to_scrape):
+    for region in tqdm(supported_regions):
         if region not in cache:
             cache[region] = {}
         for part in supported_parts:
@@ -97,8 +91,9 @@ def update_html():
             region_path.mkdir()
         for part in all_data[region]:
             part_data = all_data[region][part]
-            dict_data = [dataclass_to_dict(item) for item in part_data]
-            part_string = json.dumps(dict_data).encode()
+            # Check that all dicts are valid
+            dataclass_data = [dataclass_from_dict(part_classes[part], item) for item in part_data]
+            part_string = json.dumps(part_data).encode()
             compressed_parts = lz4.frame.compress(part_string)
             encoded_parts = str(base64.urlsafe_b64encode(compressed_parts), 'utf-8')
             html = html_doc.format(encoded_parts)
@@ -113,8 +108,5 @@ def publish():
 
 
 if __name__ == "__main__":
-    scrape_part_data()
-    parse_part_data()
-    create_json()
     update_html()
     publish()
