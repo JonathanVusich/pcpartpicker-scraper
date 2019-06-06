@@ -108,5 +108,8 @@ def publish():
 
 
 if __name__ == "__main__":
+    scrape_part_data()
+    parse_part_data()
+    create_json()
     update_html()
     publish()
