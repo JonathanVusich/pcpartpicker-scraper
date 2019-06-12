@@ -107,8 +107,7 @@ def publish():
     repo = Repo("/home/chrx/repos/pcpartpicker-scraper")
     repo.git.add(update=True)
     repo.index.commit("Updated HTML")
-    origin = repo.remote(name="origin")
-    origin.push()
+    repo.git.push()
 
 if __name__ == "__main__":
     publish()
