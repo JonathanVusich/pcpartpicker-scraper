@@ -2,18 +2,16 @@ import base64
 import json
 import subprocess
 from pathlib import Path
-from git import Repo
-import sh
-import os
 
 import lz4.frame
+import sh
 from diskcache import Cache
 from tqdm import tqdm
 
 from pcpartpicker_scraper import Parser
 from pcpartpicker_scraper import Scraper
-from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 from pcpartpicker_scraper.mappings import part_classes
+from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 
 html_doc = """<!DOCTYPE html>
 <html lang="en">
@@ -111,12 +109,13 @@ def publish():
     print(sh.git.status())
     sh.git.commit('-m "Updated HTML"')
     print(sh.git.status())
-    process = subprocess.Popen('sudo git push origin master', shell=True,
+    subprocess.call('sudo git push origin master', shell=True,
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    print(stderr)
-    print("hi")
 
 
 if __name__ == "__main__":
-    publish()
+    scrape_part_data()
+    parse_part_data()
+    create_json()
+    update_html()
+    # publish()
