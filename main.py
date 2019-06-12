@@ -2,6 +2,7 @@ import base64
 import json
 import subprocess
 from pathlib import Path
+from git import Repo
 
 import lz4.frame
 from diskcache import Cache
@@ -103,13 +104,11 @@ def update_html():
 
 
 def publish():
-    subprocess.run(["git", "add", "."], cwd="/home/chrx/repos/pcpartpicker-scraper")
-    subprocess.run(["git", "commit", "-m", "'Updated HTML'"], cwd="/home/chrx/repos/pcpartpicker-scraper")
-
+    repo = Repo("/home/chrx/repos/pcpartpicker-scraper")
+    repo.git.add(update=True)
+    repo.index.commit("Updated HTML")
+    origin = repo.remote(name="origin")
+    origin.push()
 
 if __name__ == "__main__":
-    scrape_part_data()
-    parse_part_data()
-    create_json()
-    update_html()
     publish()
