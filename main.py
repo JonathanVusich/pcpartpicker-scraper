@@ -3,6 +3,8 @@ import json
 import subprocess
 from pathlib import Path
 from git import Repo
+import sh
+import os
 
 import lz4.frame
 from diskcache import Cache
@@ -104,10 +106,17 @@ def update_html():
 
 
 def publish():
-    repo = Repo("/home/chrx/repos/pcpartpicker-scraper")
-    repo.git.add(update=True)
-    repo.index.commit("Updated HTML")
-    repo.git.push()
+    print(sh.git.status())
+    sh.git.add(".")
+    print(sh.git.status())
+    sh.git.commit('-m "Updated HTML"')
+    print(sh.git.status())
+    process = subprocess.Popen('sudo git push origin master', shell=True,
+                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    print(stderr)
+    print("hi")
+
 
 if __name__ == "__main__":
     publish()
