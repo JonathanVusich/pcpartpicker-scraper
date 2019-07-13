@@ -4,3 +4,5 @@ py-moneyed
 tqdm
 selenium
 lz4
+dacite
+pytest

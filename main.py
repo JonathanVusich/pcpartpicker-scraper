@@ -8,8 +8,8 @@ import sh
 from diskcache import Cache
 from tqdm import tqdm
 
-from pcpartpicker_scraper import Parser
-from pcpartpicker_scraper import Scraper
+from pcpartpicker_scraper.parser import Parser
+from pcpartpicker_scraper.scraper import Scraper
 from pcpartpicker_scraper.mappings import part_classes
 from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 
