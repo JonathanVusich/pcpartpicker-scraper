@@ -1,0 +1,29 @@
+language: python
+python: 3.7
+dist: xenial
+sudo: true
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      python: 3.7
+      sudo: true
+      before_install:
+        - pip install -r requirements.txt
+        - python setup.py install
+    - os: windows
+      language: sh
+      python: "3.7"
+      before_install:
+        - choco install python3
+        - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+        - pip install -r requirements.txt
+        - python setup.py install
+script:
+    - pytest
+notifications:
+  email:
+    recipients:
+      - jonathanvusich@gmail.com
+    on_success: never
+    on_failure: always
