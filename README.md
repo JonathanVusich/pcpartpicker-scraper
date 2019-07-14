@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/JonathanVusich/pcpartpicker-scraper.svg?branch=master)](https://travis-ci.org/JonathanVusich/pcpartpicker-scraper)
 # pcpartpicker-scraper
 Web scraper for the PCPartPicker website.
 
