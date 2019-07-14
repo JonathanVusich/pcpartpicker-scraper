@@ -6,3 +6,4 @@ selenium
 lz4
 dacite
 pytest
+diskcache

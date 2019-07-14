@@ -4,7 +4,6 @@ import subprocess
 from pathlib import Path
 
 import lz4.frame
-import sh
 from diskcache import Cache
 from tqdm import tqdm
 
@@ -103,19 +102,8 @@ def update_html():
                 file.write(html)
 
 
-def publish():
-    print(sh.git.status())
-    sh.git.add(".")
-    print(sh.git.status())
-    sh.git.commit('-m "Updated HTML"')
-    print(sh.git.status())
-    subprocess.call('sudo git push origin master', shell=True,
-                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-
 if __name__ == "__main__":
     scrape_part_data()
     parse_part_data()
     create_json()
     update_html()
-    # publish()
