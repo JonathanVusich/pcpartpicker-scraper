@@ -314,7 +314,7 @@ part_funcs: Dict[str, List[Callable]] = {
     "cpu": [int, core_clock, core_clock, wattage, default, boolean],
     "cpu-cooler": [fan_rpm, decibels, default, retrieve_int],
     "motherboard": [default, default, int, to_bytes, default],
-    "memory": [memory_type, default, memory_sizes, price, default, int],
+    "memory": [memory_type, default, memory_sizes, price, default, int, default],
     "internal-hard-drive": [to_bytes, price, hdd_data, to_bytes, default, default],
     "video-card": [default, to_bytes, core_clock, core_clock, default, default],
     "power-supply": [default, default, wattage, default, default],
