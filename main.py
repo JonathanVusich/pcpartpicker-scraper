@@ -1,19 +1,16 @@
 import argparse
-import base64
 import itertools
 import json
 import os
-import subprocess
+from multiprocessing import Pool
 from pathlib import Path
 
-import lz4.frame
 from diskcache import Cache
 from tqdm import tqdm
-from multiprocessing import Pool
 
+from pcpartpicker_scraper.mappings import part_classes
 from pcpartpicker_scraper.parser import Parser
 from pcpartpicker_scraper.scraper import Scraper
-from pcpartpicker_scraper.mappings import part_classes
 from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
 
 html_doc = """<!DOCTYPE html>
@@ -113,18 +110,16 @@ def update_html():
             part_data = all_data[region][part]
             # Check that all dicts are valid
             dataclass_data = [dataclass_from_dict(part_classes[part], item) for item in part_data]
-            part_string = json.dumps(part_data).encode()
-            compressed_parts = lz4.frame.compress(part_string)
-            encoded_parts = str(base64.urlsafe_b64encode(compressed_parts), 'utf-8')
-            html = html_doc.format(encoded_parts)
+            part_string = json.dumps(part_data)
+            html = html_doc.format(part_string)
             file_name = part + ".html"
             with open(region_path / file_name, "w+") as file:
                 file.write(html)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Scarp pcpartspicker.com for fun and profit.')
-    parser.add_argument('--parallel', '-P', default=1, type=int, metavar='N', help="Scarpe up to N parallel web-page concurrently")
+    parser = argparse.ArgumentParser(description='Scrape pcpartpicker.com.')
+    parser.add_argument('--parallel', '-P', default=2, type=int, metavar='N', help="Scrape up to N pages concurrently")
 
     args = parser.parse_args()
     scrape_part_data(args.parallel)
