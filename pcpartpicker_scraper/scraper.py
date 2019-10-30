@@ -18,46 +18,42 @@ class Scraper:
         self.executable_path = executable_path
 
     def get_part_data(self, region: str, part: str) -> tuple:
-        try:
-            base_url = generate_part_url(region, part)
+        base_url = generate_part_url(region, part)
 
-            # For memory parts we want to add property that isn't readily available from the data-set:
-            # The type of ECC support the memory module has
-            # For this purpose, we will query the memory URL 4 times, once per each ECC option on the search page
-            # Every time we complete reading a result set, we will merge it to a global/total list of memory modules, not before
-            # we populate a "fake" property indicating what ECC support the module has:
-            if part == "memory":
-                urls = {
-                    "Non-ECC / Unbuffered": base_url + "#E=0",
-                    "Non-ECC / Registered" : base_url + "#E=10",
-                    "ECC / Unbuffered": base_url + "#E=1",
-                    "ECC / Registered": base_url + "#E=11",
-                }
+        # For memory parts we want to add property that isn't readily available from the data-set:
+        # The type of ECC support the memory module has
+        # For this purpose, we will query the memory URL 4 times, once per each ECC option on the search page
+        # Every time we complete reading a result set, we will merge it to a global/total list of memory modules, not before
+        # we populate a "fake" property indicating what ECC support the module has:
+        if part == "memory":
+            urls = {
+                "Non-ECC / Unbuffered": base_url + "#E=0",
+                "Non-ECC / Registered" : base_url + "#E=10",
+                "ECC / Unbuffered": base_url + "#E=1",
+                "ECC / Registered": base_url + "#E=11",
+            }
 
-                total_manufacturers_set = set()
-                total_product_set = set()
+            total_manufacturers_set = set()
+            total_product_set = set()
 
-                for ecc_type, url in urls.items():
-                    # This will generate a result-set per ECC type
-                    manufacturers, product_set = self.get_part_data_for_url(url)
-                    # This will merge the manufacturer list from the per-ECC query back to the final
-                    # list of manufacturers
-                    total_manufacturers_set = total_manufacturers_set | set(manufacturers)
-                    # Before we merge the per-ECC product list back with the global list,
-                    # We have to add the ecc_type back to the tuple so that it would "appear" as if the scraped data
-                    # had the ecc information embedded in it organically
-                    product_set = set(map(lambda t: t[:-1] + (ecc_type,) + t[-1:], product_set))
-                    # Merge the product list
-                    total_product_set = total_product_set | set(product_set)
+            for ecc_type, url in urls.items():
+                # This will generate a result-set per ECC type
+                manufacturers, product_set = self.get_part_data_for_url(url)
+                # This will merge the manufacturer list from the per-ECC query back to the final
+                # list of manufacturers
+                total_manufacturers_set = total_manufacturers_set | set(manufacturers)
+                # Before we merge the per-ECC product list back with the global list,
+                # We have to add the ecc_type back to the tuple so that it would "appear" as if the scraped data
+                # had the ecc information embedded in it organically
+                product_set = set(map(lambda t: t[:-1] + (ecc_type,) + t[-1:], product_set))
+                # Merge the product list
+                total_product_set = total_product_set | set(product_set)
 
-                # Finally, we return the memory manufacturer+product list as if they were 
-                # all generated from a single scraping session
-                return list(total_manufacturers_set), list(total_product_set)
-            else:
-                return self.get_part_data_for_url(base_url)
-        except Exception:
-            print(f"Failed to scrape {region}/{part}")
-            raise
+            # Finally, we return the memory manufacturer+product list as if they were
+            # all generated from a single scraping session
+            return list(total_manufacturers_set), list(total_product_set)
+        else:
+            return self.get_part_data_for_url(base_url)
 
 
     def get_part_data_for_url(self, url: str) -> tuple:
