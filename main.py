@@ -59,6 +59,9 @@ def scrape_part_data(pool_size):
     to_scrape = list(itertools.product(supported_parts, supported_regions))
     total_to_scrape=len(to_scrape)
     to_scrape = list(filter(lambda x: x[0] not in cache[x[1]], to_scrape))
+    if pool_size == 1:
+        scrape_part_region_combo(to_scrape)
+        return
     pool = Pool(pool_size)
     print(f"About to scrape {len(to_scrape)}/{total_to_scrape} part+region combos that are not cached using {pool_size} concurrent requests")
     pool.map(scrape_part_region_combo, to_scrape)
