@@ -7,3 +7,4 @@ lz4
 dacite
 pytest
 diskcache
+pcpartpicker

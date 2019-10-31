@@ -7,7 +7,7 @@ from moneyed import USD
 
 from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
-from .parse_utils import tokenize, part_funcs
+from .parse_utils import part_funcs
 from .parts import *
 from .utils import num_pattern
 

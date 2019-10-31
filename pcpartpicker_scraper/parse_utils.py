@@ -2,7 +2,6 @@ import logging
 import re
 from typing import Generator, List, Optional, Tuple, Union, Dict, Callable
 
-from .brands import brands
 from .mappings import byte_classes, clockspeeds
 from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
 from .utils import retrieve_float, retrieve_int, num_pattern
@@ -216,7 +215,7 @@ def network_speed(data: str) -> Tuple[NetworkSpeed, int]:
     """
 
     speed_port_info = re.findall(num_pattern, data)
-    freq = int(speed_port_info[0])
+    freq = float(speed_port_info[0])
     if "Mbit/s" in data:
         if len(speed_port_info) == 1:
             return NetworkSpeed.from_mbits(freq), 1
@@ -327,7 +326,7 @@ part_funcs: Dict[str, List[Callable]] = {
     "sound-card": [retrieve_float, num, retrieve_int, retrieve_float, default, default],
     "wired-network-card": [default, network_speed, default],
     "wireless-network-card": [default, default, default],
-    "monitor": [num, resolution, retrieve_int, retrieve_int, default, default],
+    "monitor": [num, resolution, retrieve_int, retrieve_float, default, default],
     "external-hard-drive": [default, default, to_bytes, price, default],
     "headphones": [default, frequency_response, boolean, boolean, default, default],
     "keyboard": [default, default, default, boolean, default, default],
