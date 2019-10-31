@@ -1,6 +1,6 @@
 import random
 import time
-from typing import List, Set
+from typing import List
 
 import lxml.html
 from selenium import webdriver
