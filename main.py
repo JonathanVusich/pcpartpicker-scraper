@@ -5,6 +5,8 @@ import os
 from multiprocessing import Pool
 from pathlib import Path
 
+from datetime import datetime
+
 from diskcache import Cache
 from tqdm import tqdm
 
@@ -30,6 +32,17 @@ def scrape_part_region_combo(p):
     region = p[1]
     scraper = Scraper("/usr/lib/chromium-browser/chromedriver")
     cache = Cache("/tmp/pcpartpicker-cache/")
+    if "timestamp" in cache:
+        timestamp = cache["timestamp"]
+        if datetime.now().day > timestamp.day:
+            cache.clear()
+            cache["timestamp"] = datetime.now()
+            print("Clearing cache...")
+    else:
+        cache.clear()
+        cache["timestamp"] = datetime.now()
+        print("Clearing cache...")
+
     part_data = scraper.get_part_data(region, part)
     stored_parts = cache[region]
     stored_parts.update({part: part_data})
@@ -48,16 +61,19 @@ def scrape_part_data(pool_size):
                          "in", "ie", "it", "nz", "uk", "us"}
 
 
-    scraper = Scraper("/usr/lib/chromium-browser/chromedriver")
     cache = Cache("/tmp/pcpartpicker-cache/")
-    #cache.clear()
+    if "timestamp" in cache:
+        timestamp = cache["timestamp"]
+        if datetime.now().day > timestamp.day:
+            cache.clear()
+            cache["timestamp"] = datetime.now()
 
     for region in supported_regions:
         if region not in cache:
             cache[region] = {}
 
     to_scrape = list(itertools.product(supported_parts, supported_regions))
-    total_to_scrape=len(to_scrape)
+    total_to_scrape = len(to_scrape)
     to_scrape = list(filter(lambda x: x[0] not in cache[x[1]], to_scrape))
     pool = Pool(pool_size)
     print(f"About to scrape {len(to_scrape)}/{total_to_scrape} part+region combos that are not cached using {pool_size} concurrent requests")
@@ -66,6 +82,12 @@ def scrape_part_data(pool_size):
 
 def parse_part_data():
     cache = Cache("/tmp/pcpartpicker-cache/")
+    if "timestamp" in cache:
+        timestamp = cache["timestamp"]
+        if datetime.now().day > timestamp.day:
+            cache.clear()
+            cache["timestamp"] = datetime.now()
+
     parsed_part_data = {}
     for region in tqdm(cache):
         parsed_parts = {}
