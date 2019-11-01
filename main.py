@@ -32,16 +32,6 @@ def scrape_part_region_combo(p):
     region = p[1]
     scraper = Scraper("/usr/lib/chromium-browser/chromedriver")
     cache = Cache("/tmp/pcpartpicker-cache/")
-    if "timestamp" in cache:
-        timestamp = cache["timestamp"]
-        if datetime.now().day > timestamp.day:
-            cache.clear()
-            cache["timestamp"] = datetime.now()
-            print("Clearing cache...")
-    else:
-        cache.clear()
-        cache["timestamp"] = datetime.now()
-        print("Clearing cache...")
 
     part_data = scraper.get_part_data(region, part)
     stored_parts = cache[region]
@@ -67,6 +57,11 @@ def scrape_part_data(pool_size):
         if datetime.now().day > timestamp.day:
             cache.clear()
             cache["timestamp"] = datetime.now()
+            print("Clearing cache...")
+    else:
+        cache.clear()
+        cache["timestamp"] = datetime.now()
+        print("Clearing cache...")
 
     for region in supported_regions:
         if region not in cache:
@@ -82,14 +77,11 @@ def scrape_part_data(pool_size):
 
 def parse_part_data():
     cache = Cache("/tmp/pcpartpicker-cache/")
-    if "timestamp" in cache:
-        timestamp = cache["timestamp"]
-        if datetime.now().day > timestamp.day:
-            cache.clear()
-            cache["timestamp"] = datetime.now()
 
     parsed_part_data = {}
     for region in tqdm(cache):
+        if region == "timestamp":
+            continue
         parsed_parts = {}
         part_data = cache[region]
         for part, part_data in part_data.items():
