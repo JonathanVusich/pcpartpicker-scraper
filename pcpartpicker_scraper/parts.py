@@ -290,8 +290,8 @@ class Motherboard:
     model: str
     socket: str
     form_factor: str
-    ram_slots: int
     max_ram: Bytes
+    ram_slots: int
     color: str
     price: Money
 
@@ -300,8 +300,8 @@ class Motherboard:
         check_typing(self.model, str)
         check_typing(self.socket, str)
         check_typing(self.form_factor, str)
-        check_typing(self.ram_slots, int)
         check_typing(self.max_ram, Bytes)
+        check_typing(self.ram_slots, int)
         check_typing(self.color, str)
         check_typing(self.price, Money)
 

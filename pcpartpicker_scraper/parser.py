@@ -68,7 +68,11 @@ class Parser:
                 if not token or token in none_symbols:
                     parsed_data.append(None)
                     continue
-            result = func(token)
+
+            try:
+                result = func(token)
+            except ValueError:
+                print("")
             if isinstance(result, tuple):
                 parsed_data.extend(result)
             else:

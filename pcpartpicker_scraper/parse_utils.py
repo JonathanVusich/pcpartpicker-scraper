@@ -312,7 +312,7 @@ def va(va_data: str) -> float:
 part_funcs: Dict[str, List[Callable]] = {
     "cpu": [int, core_clock, core_clock, wattage, default, boolean],
     "cpu-cooler": [fan_rpm, decibels, default, retrieve_int],
-    "motherboard": [default, default, int, to_bytes, default],
+    "motherboard": [default, default, to_bytes, int, default],
     "memory": [memory_type, default, memory_sizes, price, default, int, default],
     "internal-hard-drive": [to_bytes, price, hdd_data, to_bytes, default, default],
     "video-card": [default, to_bytes, core_clock, core_clock, default, default],
