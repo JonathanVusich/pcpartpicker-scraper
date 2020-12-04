@@ -380,8 +380,8 @@ class GPU:
     vram: Bytes
     core_clock: ClockSpeed
     boost_clock: ClockSpeed
-    interface: str
     color: str
+    length: float
     price: Money
 
     def __post_init__(self):
@@ -391,8 +391,8 @@ class GPU:
         check_typing(self.vram, Bytes)
         check_typing(self.core_clock, ClockSpeed)
         check_typing(self.boost_clock, ClockSpeed)
-        check_typing(self.interface, str)
         check_typing(self.color, str)
+        check_typing(self.length, float)
         check_typing(self.price, Money)
 
 
