@@ -136,7 +136,7 @@ if __name__ == "__main__":
     parser.add_argument('--parallel', '-P', default=2, type=int, metavar='N', help="Scrape up to N pages concurrently")
 
     args = parser.parse_args()
-    # scrape_part_data(args.parallel)
+    scrape_part_data(args.parallel)
     parse_part_data()
     create_json()
     update_html()
