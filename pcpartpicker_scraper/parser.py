@@ -72,7 +72,8 @@ class Parser:
             try:
                 result = func(token)
             except ValueError:
-                print("")
+                result = func(token)
+                result = None
             if isinstance(result, tuple):
                 parsed_data.extend(result)
             else:

@@ -215,17 +215,9 @@ def network_speed(data: str) -> Tuple[NetworkSpeed, int]:
     """
 
     speed_port_info = re.findall(num_pattern, data)
-    freq = float(speed_port_info[0])
-    if "Mbit/s" in data:
-        if len(speed_port_info) == 1:
-            return NetworkSpeed.from_mbits(freq), 1
-        else:
-            return NetworkSpeed.from_mbits(freq), int(speed_port_info[1])
-    else:
-        if len(speed_port_info) == 1:
-            return NetworkSpeed.from_gbits(freq), 1
-        else:
-            return NetworkSpeed.from_gbits(freq), int(speed_port_info[1])
+    freq = float(speed_port_info[1])
+    num = int(speed_port_info[0])
+    return NetworkSpeed.from_gbits(freq), num
 
 
 def price(data: str) -> str:
@@ -313,7 +305,7 @@ part_funcs: Dict[str, List[Callable]] = {
     "cpu": [int, core_clock, core_clock, wattage, default, boolean],
     "cpu-cooler": [fan_rpm, decibels, default, retrieve_int],
     "motherboard": [default, default, to_bytes, int, default],
-    "memory": [memory_type, default, memory_sizes, price, default, int, default],
+    "memory": [memory_type, memory_sizes, price, default, retrieve_float, int, default],
     "internal-hard-drive": [to_bytes, price, hdd_data, to_bytes, default, default],
     "video-card": [default, to_bytes, core_clock, core_clock, default, default],
     "power-supply": [default, default, wattage, default, default],
