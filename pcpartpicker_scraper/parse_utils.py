@@ -217,7 +217,10 @@ def network_speed(data: str) -> Tuple[NetworkSpeed, int]:
     speed_port_info = re.findall(num_pattern, data)
     freq = float(speed_port_info[1])
     num = int(speed_port_info[0])
-    return NetworkSpeed.from_gbits(freq), num
+    if "Mbit/s" in data:
+        return NetworkSpeed.from_mbits(freq), num
+    else:
+        return NetworkSpeed.from_gbits(freq), num
 
 
 def price(data: str) -> str:
