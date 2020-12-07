@@ -3,6 +3,7 @@ import re
 from decimal import Decimal
 from multiprocessing import Pool
 from os import scandir, path
+import os
 from typing import Tuple, Dict
 
 from dacite import from_dict, Config
@@ -36,6 +37,9 @@ def get_part_data() -> Dict[str, Dict[str, str]]:
     docs_path = "docs"
     with scandir(path=docs_path) as curdir:
         for region in curdir:
+            # jekyll theme filter
+            if not os.path.isdir(region):
+                continue
             part_data = {}
             with scandir(path=path.join(docs_path, region.name)) as regiondir:
                 for part in regiondir:
