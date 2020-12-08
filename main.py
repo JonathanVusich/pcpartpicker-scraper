@@ -54,7 +54,7 @@ def scrape_part_data(pool_size):
     cache = Cache("/tmp/pcpartpicker-cache/")
     if "timestamp" in cache:
         timestamp = cache["timestamp"]
-        if datetime.now().day > timestamp.day:
+        if datetime.now().month > timestamp.month:
             cache.clear()
             cache["timestamp"] = datetime.now()
             print("Clearing cache...")
