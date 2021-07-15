@@ -55,9 +55,10 @@ class Scraper:
                 return list(total_manufacturers_set), list(total_product_set)
             else:
                 return self.get_part_data_for_url(base_url)
-        except Exception:
+        except Exception as e:
             print(f"Failed to scrape {region}/{part}")
-            raise
+            print(e)
+            raise e
 
     def get_part_data_for_url(self, url: str) -> tuple:
         driver = self.get_driver()
