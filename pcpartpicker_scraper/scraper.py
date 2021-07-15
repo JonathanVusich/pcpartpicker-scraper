@@ -21,15 +21,15 @@ class Scraper:
         try:
             base_url = generate_part_url(region, part)
 
-            # For memory parts we want to add property that isn't readily available from the data-set:
-            # The type of ECC support the memory module has
-            # For this purpose, we will query the memory URL 4 times, once per each ECC option on the search page
-            # Every time we complete reading a result set, we will merge it to a global/total list of memory modules, not before
-            # we populate a "fake" property indicating what ECC support the module has:
+            # For memory parts we want to add property that isn't readily available from the data-set: The type of
+            # ECC support the memory module has For this purpose, we will query the memory URL 4 times, once per each
+            # ECC option on the search page Every time we complete reading a result set, we will merge it to a
+            # global/total list of memory modules, not before we populate a "fake" property indicating what ECC
+            # support the module has:
             if part == "memory":
                 urls = {
                     "Non-ECC / Unbuffered": base_url + "#E=0",
-                    "Non-ECC / Registered" : base_url + "#E=10",
+                    "Non-ECC / Registered": base_url + "#E=10",
                     "ECC / Unbuffered": base_url + "#E=1",
                     "ECC / Registered": base_url + "#E=11",
                 }
@@ -58,7 +58,6 @@ class Scraper:
         except Exception:
             print(f"Failed to scrape {region}/{part}")
             raise
-
 
     def get_part_data_for_url(self, url: str) -> tuple:
         driver = self.get_driver()

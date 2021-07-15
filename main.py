@@ -2,6 +2,7 @@ import argparse
 import itertools
 import json
 import os
+import sqlite3
 from multiprocessing import Pool
 from pathlib import Path
 
@@ -14,17 +15,6 @@ from pcpartpicker_scraper.mappings import part_classes
 from pcpartpicker_scraper.parser import Parser
 from pcpartpicker_scraper.scraper import Scraper
 from pcpartpicker_scraper.serialization import dataclass_to_dict, dataclass_from_dict
-
-html_doc = """<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Data</title>
-  </head>
-  <body>
-  {}
-  </body>
-</html>"""
 
 
 def scrape_part_region_combo(p):
@@ -50,7 +40,6 @@ def scrape_part_data(pool_size):
     supported_regions = {"au", "be", "ca", "de", "es", "fr", "se",
                          "in", "ie", "it", "nz", "uk", "us"}
 
-
     cache = Cache("/tmp/pcpartpicker-cache/")
     if "timestamp" in cache:
         timestamp = cache["timestamp"]
@@ -71,7 +60,9 @@ def scrape_part_data(pool_size):
     total_to_scrape = len(to_scrape)
     to_scrape = list(filter(lambda x: x[0] not in cache[x[1]], to_scrape))
     pool = Pool(pool_size)
-    print(f"About to scrape {len(to_scrape)}/{total_to_scrape} part+region combos that are not cached using {pool_size} concurrent requests")
+    print(
+        f"About to scrape {len(to_scrape)}/{total_to_scrape} part+region combos that are not cached using {pool_size} "
+        f"concurrent requests")
     pool.map(scrape_part_region_combo, to_scrape)
 
 
@@ -90,53 +81,34 @@ def parse_part_data():
             pparts = parser.parse(parts)
             parsed_parts[part] = pparts
         parsed_part_data[region] = parsed_parts
-    parsed_cache = Cache(os.path.expanduser("~/pcpartpicker-parsed/"))
+    parsed_cache = Cache("/tmp/pcpartpicker-parsed/")
     parsed_cache["current"] = parsed_part_data
 
 
-def create_json():
-    all_data = {}
-    cache = Cache(os.path.expanduser("~/pcpartpicker-parsed/"))
+def write_to_database(database: str):
+    db_connection = sqlite3.connect(database)
+    cache = Cache("/tmp/pcpartpicker-parsed/")
     region_data = cache["current"]
     for region in tqdm(region_data):
         part_data = region_data[region]
-        dict_data = {}
         for part, data in part_data.items():
             data_to_dict = [dataclass_to_dict(item) for item in data]
-            dict_data.update({part: data_to_dict})
-        all_data.update({region: dict_data})
-    cache = Cache(os.path.expanduser("~/pcpartpicker-json/"))
-    cache["current"] = all_data
 
+            # Verify that the dataclasses are legit
+            dataclass_data = [dataclass_from_dict(part_classes[part], item) for item in data_to_dict]
 
-def update_html():
-    cache = Cache(os.path.expanduser("~/pcpartpicker-json/"))
-    all_data = cache["current"]
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    path = Path(os.path.join(dir_path, "docs"))
-    if not path.exists():
-        path.mkdir()
-    for region in all_data:
-        region_path = path / region
-        if not region_path.exists():
-            region_path.mkdir()
-        for part in all_data[region]:
-            part_data = all_data[region][part]
-            # Check that all dicts are valid
-            dataclass_data = [dataclass_from_dict(part_classes[part], item) for item in part_data]
-            part_string = json.dumps(part_data)
-            html = html_doc.format(part_string)
-            file_name = part + ".html"
-            with open(region_path / file_name, "w+") as file:
-                file.write(html)
+            formatted_part_name = part.replace("-", "_")
+
+            db_connection.execute(f"create table if not exists {region}_{formatted_part_name} (part text);")
+            db_connection.executemany(f"insert into {region}_{formatted_part_name} values(?);", data_to_dict)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Scrape pcpartpicker.com.')
+    parser = argparse.ArgumentParser(description='Scrape pcpartpicker.com')
+    parser.add_argument('--database', type=str, help="Determine the database to serialize the data to.")
     parser.add_argument('--parallel', '-P', default=2, type=int, metavar='N', help="Scrape up to N pages concurrently")
 
     args = parser.parse_args()
     scrape_part_data(args.parallel)
     parse_part_data()
-    create_json()
-    update_html()
+    write_to_database(args.database)

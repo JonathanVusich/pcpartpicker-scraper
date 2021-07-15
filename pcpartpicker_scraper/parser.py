@@ -3,12 +3,11 @@ import re
 from typing import List, Tuple, Optional
 
 import lxml.html
-from moneyed import USD
+from moneyed import USD, Money
 
 from .mappings import currency_classes, currency_symbols, part_classes, \
     none_symbols
 from .parse_utils import part_funcs
-from .parts import *
 from .utils import num_pattern
 
 logger = logging.getLogger(__name__)

@@ -2,8 +2,9 @@ import logging
 import re
 from typing import Generator, List, Optional, Tuple, Union, Dict, Callable
 
+from pcpartpicker.parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
+
 from .mappings import byte_classes, clockspeeds
-from .parts import Bytes, CFM, ClockSpeed, Decibels, FrequencyResponse, NetworkSpeed, Resolution, RPM
 from .utils import retrieve_float, retrieve_int, num_pattern
 
 logger = logging.getLogger(__name__)
