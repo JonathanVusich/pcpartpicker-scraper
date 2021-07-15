@@ -61,6 +61,7 @@ class Scraper:
             raise e
 
     def get_part_data_for_url(self, url: str) -> tuple:
+        time.sleep(10)
         driver = self.get_driver()
         driver.get(url)
         manufacturers = get_manufacturers(driver)
@@ -74,6 +75,7 @@ class Scraper:
             page_numbers = set((x for x in range(2, total_page_number + 1)))
         previous_products = set(products)
         while len(page_numbers) > 0:
+            time.sleep(10)
             new_page_num = random.sample(page_numbers, 1)[0]
             page_numbers.remove(new_page_num)
             new_url = generate_page_url_from_base(url, new_page_num)

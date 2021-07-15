@@ -33,7 +33,7 @@ class Parser:
         self.currency_sign = currency_symbols[self.region]
         self.currency = currency_classes[self.region]
 
-    def parse(self, parts: List[List[str]]):
+    def parse(self, parts: List[List[str]]) -> List[object]:
         part_list = [self.parse_token(token) for token in parts]
         part_list.sort(key=lambda x: (x.brand, x.model if isinstance(x.model, str) else ""))
         return part_list
